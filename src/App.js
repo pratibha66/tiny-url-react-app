@@ -9,7 +9,6 @@ class App extends Component {
     urls: []
   }
   addUrl = (url) => {
-    url.shortUrl = Math.random();
     let urls = [...this.state.urls,{userId : url.userId, shortUrl: url.shortUrl}];
     this.setState({
       urls
@@ -20,18 +19,30 @@ class App extends Component {
    fetch('http://localhost:8080/tinyurl')
    .then(response => response.json())
    .then(urls  => this.setState({ urls }));
-   console.log(this.state);
   }
+  
   deleteUrl = (shortUrl, userId) => {
-    console.log(shortUrl, userId);
-    let urls = this.state.urls.filter(url => {
-      return (url.shortUrl !== shortUrl || url.userId !== userId)
-    });
-    console.log(urls);
-    this.setState({
-      urls
-    });
+    var n = shortUrl.lastIndexOf("/");
+    var res = shortUrl.substring(n+1);
+    return fetch('http://localhost:8080/tinyurl/'+ userId + '/' + res, {
+      method: 'delete'
+    }).then(response =>
+      {
+        if(response.status === 202){
+      let urls = this.state.urls.filter(url => {
+        return (url.shortUrl !== shortUrl || url.userId !== userId)
+      });
+      this.setState({
+        urls
+      });
+    } else{
+      alert("Failed to delete resources");
+    }
+    }
+    );
   }
+  
+
   render() {
     return (
       <div className="App">

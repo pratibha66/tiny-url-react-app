@@ -11,10 +11,28 @@ class AddUrl extends Component {
       [e.target.id]: e.target.value
     });
   }
-  handleSubmit = (e) => {
+  handleSubmit = (e) => { 
     e.preventDefault();
-    //console.log(this.state);
+    var data = {"originalUrl" : this.state.originalUrl, "userId" : this.state.userId};
+    console.log(data);
+    fetch('http://localhost:8080/tinyurl/', {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Expose-Headers" : "Location"
+      },
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+  })
+  .then(response => response.json())
+  .then (response => {
+    console.log(response.tinyUrl)
+    this.setState({
+      shortUrl : 'http://'+response.tinyUrl
+    });
     this.props.addUrl(this.state);
+  }
+    );
+
   }
   render() {
     return (
@@ -24,8 +42,8 @@ class AddUrl extends Component {
           <input type="text" id="originalUrl" onChange={this.handleChange} />
           <label htmlFor="userId">UserId:</label>
           <input type="text" id="userId" onChange={this.handleChange} />
-          <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-            <i class="material-icons right">send</i>
+          <button className="btn waves-effect waves-light" type="submit" name="action">Submit
+            <i className="material-icons right">send</i>
           </button>
         </form>
       </div>
